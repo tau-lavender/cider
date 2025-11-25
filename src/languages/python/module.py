@@ -1,19 +1,28 @@
+from src.default_class import (
+    Framework,
+    Language
+)
 
-from src.language import Language
+import importlib
+import inspect
+
+from pathlib import Path
+
+from src.languages.python.config import FRAMEWORK_IMPORT_CONFIG
 
 
 class PythonLanguage(Language):
     def __init__(self):
-        self.masks
-        self.frameworks
         super().__init__()
+        self.masks: set = {
+            "*.py",
+            # TODO: uv, poetry, pip ????????
+        }
+        self.framework_config = FRAMEWORK_IMPORT_CONFIG
 
-    def load_frameworks():
-        pass
-
-    def analyze(self):
-        for fr in self.frameworks:
-            fr.analyze()
+    def analyze(self, file: Path):
+        for framework in self.frameworks:
+            framework.analyze(file)
 
     def build(self):
         """

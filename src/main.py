@@ -19,7 +19,7 @@ def main(
 
     if not dir.exists():
         os.mkdir(dir)
-    subprocess.run(f"git clone {link}")
+    subprocess.run(["git", "clone", link, dir])
     os.chdir(dir)
 
     # TODO
