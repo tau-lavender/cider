@@ -14,6 +14,7 @@ from src.languages.python.config import FRAMEWORK_IMPORT_CONFIG
 class PythonLanguage(Language):
     def __init__(self):
         super().__init__()
+        self.name = "Python"
         self.masks: set = {
             "*.py",
             # TODO: uv, poetry, pip ????????
