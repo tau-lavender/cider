@@ -1,0 +1,102 @@
+services:
+  # PostgreSQL для SonarQube
+  postgres:
+    image: postgres:16-alpine
+    container_name: sonarqube-postgres
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar123
+      POSTGRES_DB: sonar
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cicd_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SonarQube
+  sonarqube:
+    image: sonarqube:25.11.0.114957-community
+    container_name: sonarqube
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar123
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "9000:9000"
+    networks:
+      - cicd_network
+    ulimits:
+      nproc: 4096
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  # Jenkins
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./jenkins-init.groovy:/var/jenkins_home/init.groovy.d/01-init.groovy:ro
+      # Монтируем Docker socket для сборки Docker образов
+      # ВНИМАНИЕ: Монтирование Docker socket дает полный доступ к Docker daemon хоста
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Монтируем директорию с тестовыми проектами (для локального тестирования)
+      # Путь должен быть абсолютным или относительным от docker-compose.yml
+      - ../test:/var/jenkins_home/test:ro
+    networks:
+      - cicd_network
+    restart: unless-stopped
+
+  # Nexus Repository
+  nexus:
+    image: sonatype/nexus3:3.86.0
+    container_name: nexus
+    ports:
+      - "8081:8081"
+      # - "8082:8082"
+    environment:
+      NEXUS_SECURITY_RANDOMPASSWORD: false
+    volumes:
+      - nexus_data:/nexus-data
+    networks:
+      - cicd_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  sonarqube_data:
+    driver: local
+  sonarqube_extensions:
+    driver: local
+  sonarqube_logs:
+    driver: local
+  jenkins_home:
+    driver: local
+  nexus_data:
+    driver: local
+
+networks:
+  cicd_network:
+    driver: bridge

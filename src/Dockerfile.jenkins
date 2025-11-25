@@ -1,0 +1,76 @@
+FROM jenkins/jenkins:2.528.2-lts-jdk21
+
+USER root
+
+# Аргументы версий
+ARG MAVEN_VERSION=3.9.9
+ARG GRADLE_VERSION=8.10.2
+ARG NODE_VERSION=22.11.0
+ARG GO_VERSION=1.23.4
+
+# Установка системных зависимостей и Python
+RUN apt-get update && apt-get install -y \
+    git curl wget unzip zip xz-utils \
+    ca-certificates gnupg lsb-release \
+    python3 python3-pip \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/python3 /usr/local/bin/python \
+    && ln -s /usr/bin/pip3 /usr/local/bin/pip
+
+# Установка Docker CLI
+RUN ARCH=$(dpkg --print-architecture) && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+    echo "deb [arch=${ARCH} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+    apt-get update && apt-get install -y docker-ce-cli && \
+    rm -rf /var/lib/apt/lists/*
+
+# Установка Maven
+RUN mkdir -p /opt/maven \
+    && curl -fsSL https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz | tar -xzC /opt/maven --strip-components=1 \
+    && ln -s /opt/maven/bin/mvn /usr/local/bin/mvn
+
+# Установка Gradle
+RUN mkdir -p /opt/gradle \
+    && curl -fsSL https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o /tmp/gradle.zip \
+    && unzip -q /tmp/gradle.zip -d /opt/gradle \
+    && mv /opt/gradle/gradle-${GRADLE_VERSION}/* /opt/gradle \
+    && rm -rf /opt/gradle/gradle-${GRADLE_VERSION} /tmp/gradle.zip \
+    && ln -s /opt/gradle/bin/gradle /usr/local/bin/gradle
+
+# Установка Node.js
+RUN curl -fsSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | tar -xJ \
+    && mv node-v${NODE_VERSION}-linux-x64 /opt/nodejs \
+    && ln -s /opt/nodejs/bin/node /usr/local/bin/node \
+    && ln -s /opt/nodejs/bin/npm /usr/local/bin/npm \
+    && ln -s /opt/nodejs/bin/npx /usr/local/bin/npx
+
+# Установка Go
+RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzC /usr/local \
+    && ln -s /usr/local/go/bin/go /usr/local/bin/go \
+    && ln -s /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+
+# Установка SonarQube Scanner
+RUN curl -fsSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip -o /tmp/sonar-scanner.zip && \
+    unzip -q /tmp/sonar-scanner.zip -d /opt && \
+    mv /opt/sonar-scanner-* /opt/sonar-scanner && \
+    rm /tmp/sonar-scanner.zip && \
+    ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner && \
+    chmod +x /usr/local/bin/sonar-scanner
+
+# Настройка переменных окружения
+ENV MAVEN_HOME=/opt/maven \
+    GRADLE_HOME=/opt/gradle \
+    JAVA_HOME=/usr/local/openjdk-21 \
+    PATH="/opt/maven/bin:/opt/gradle/bin:/opt/nodejs/bin:/usr/local/go/bin:${PATH}"
+
+# Создание директории для SSH ключей
+RUN mkdir -p /var/jenkins_home/.ssh && \
+    chmod 700 /var/jenkins_home/.ssh && \
+    chown -R jenkins:jenkins /var/jenkins_home/.ssh
+
+# Переключение на пользователя jenkins
+USER jenkins
+
+# Копирование и установка плагинов
+COPY --chown=jenkins:jenkins plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
