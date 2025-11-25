@@ -1,7 +1,11 @@
 from pathlib import Path
 from enum import Enum
 
+import importlib
+import inspect
+
 from src.language import Language
+from src.configs.language import LANGUAGES_IMPORT_CONFIG
 
 
 class MainAnalyzer():
@@ -13,11 +17,15 @@ class MainAnalyzer():
         self.path = path
         self.languages: list[Language] = []
 
-    def load_analyzers(self):
-        pass
+    def load_languages(self):
+        for plugin_name in LANGUAGES_IMPORT_CONFIG:
+            mod = importlib.import_module(plugin_name)
+            classes = inspect.getmembers(mod, inspect.isclass)
+            for language in classes:
+                if isinstance(language, Language):
+                    self.languages.append(language)
 
     def analyze(self):
-        print("!!!!")
         """
         Ходим по файлам, кидаем их в аналайзеры
         """

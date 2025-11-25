@@ -1,8 +1,10 @@
-from src.analyzer import Analyzer
-from src.builder import Builder
-
-
 class Framework():
-    def __init__(self, analyzer: Analyzer, builder: Builder):
-        self.analyzer = analyzer
-        self.builder = builder
+    def __init__(self):
+        self.project_data: set = set()
+        pass
+
+    def analyze(self):
+        pass
+
+    def build(self):
+        pass

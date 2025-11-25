@@ -7,8 +7,8 @@ from src.constants import PATH_TO_ROOT
 
 from src.analyzer import MainAnalyzer
 
-
 app = typer.Typer()
+
 
 @app.command()
 def main(
@@ -16,16 +16,20 @@ def main(
     dir: Path = ".",
 ):
     print(link, dir)
-    if not(dir.exists()):
+
+    if not dir.exists():
         os.mkdir(dir)
-    os.chdir(dir)
     subprocess.run(f"git clone {link}")
-    os.chdir(PATH_TO_ROOT)
+    os.chdir(dir)
 
     # TODO
-    # create class Analyzer 
+    # create class Analyzer
     main_analyzer = MainAnalyzer()
-    MainAnalyzer.analyze()
+    main_analyzer.load_languages()
+
+    main_analyzer.analyze()
+
+    os.chdir(PATH_TO_ROOT)
 
     # TODO
     # Build
