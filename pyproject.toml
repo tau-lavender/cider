@@ -1,0 +1,8 @@
+[project]
+name = "cider"
+version = "0.1.0"
+description = "Self-Deploy: GitLab CI-CD pipelines"
+requires-python = ">=3.14"
+dependencies = [
+    "typer>=0.20.0",
+]
