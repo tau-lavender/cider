@@ -1,0 +1,6 @@
+ci-cd
+
+stages:
+build
+test
+deploy

@@ -17,6 +17,7 @@ class MainAnalyzer():
         pass
 
     def analyze(self):
+        print("!!!!")
         """
         Ходим по файлам, кидаем их в аналайзеры
         """

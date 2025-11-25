@@ -5,6 +5,8 @@ from pathlib import Path
 
 from src.constants import PATH_TO_ROOT
 
+from src.analyzer import MainAnalyzer
+
 
 app = typer.Typer()
 
@@ -14,17 +16,20 @@ def main(
     dir: Path = ".",
 ):
     print(link, dir)
-    try:
-        if not(dir.exists()):
-            os.mkdir(dir)
-        os.chdir(dir)
-        subprocess.run(f"git clone {link}")
-        os.chdir(PATH_TO_ROOT)
-    except OSError as e:
-        print(f"OSError: {e}")
+    if not(dir.exists()):
+        os.mkdir(dir)
+    os.chdir(dir)
+    subprocess.run(f"git clone {link}")
+    os.chdir(PATH_TO_ROOT)
+
+    # TODO
+    # create class Analyzer 
+    main_analyzer = MainAnalyzer()
+    MainAnalyzer.analyze()
+
+    # TODO
+    # Build
+
 
 if __name__ == "__main__":
-    try:
-        app()
-    except OSError as e:
-        print(f"OSError: {e}")
+    app()
