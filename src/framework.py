@@ -6,9 +6,3 @@ class Framework():
     def __init__(self, analyzer: Analyzer, builder: Builder):
         self.analyzer = analyzer
         self.builder = builder
-
-
-class Module():
-    def __init__(self):
-        self.filetypes: list[str] = []
-        self.frameworks: list[Framework]

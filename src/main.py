@@ -12,7 +12,7 @@ app = typer.Typer()
 def main(
     link: str,
     dir: Path = ".",
-    ):
+):
     print(link, dir)
     try:
         if not(dir.exists()):
