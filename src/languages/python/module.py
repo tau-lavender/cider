@@ -17,7 +17,9 @@ class PythonLanguage(Language):
         self.name = "Python"
         self.masks: set = {
             "*.py",
-            # TODO: uv, poetry, pip ????????
+            "pyproject.toml",
+            "requirements.txt"
+            "uv.lock",
         }
         self.framework_config = FRAMEWORK_IMPORT_CONFIG
 
