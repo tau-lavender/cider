@@ -32,7 +32,6 @@ class PythonLanguage(Language):
         
         self.requires_python = ""
         self.dependence_manager: DependenceManager = DependenceManager.NO_MANAGER
-        self.start_cmd: str | None = None
 
     def analyze(self, file_path: Path):
         with open(file_path, "r") as file: 
@@ -45,13 +44,12 @@ class PythonLanguage(Language):
             framework.analyze(file_path, file_contents)
 
     def build(self):
+        # TODO: если будет время добавить рендер докера
         for framework in self.frameworks:
             framework.build()
         singleton = Singleton()
         match self.dependence_manager:
             case DependenceManager.NO_MANAGER:
-                # TODO: start default python
-
                 pass
             case DependenceManager.UV:
                 uv_venv_job = Job("sh", "uv venv")
@@ -64,3 +62,17 @@ class PythonLanguage(Language):
                     for job in stage.jobs:
                         if "python" in job.tag:
                             job.command = "uv run " + job.command
+            case DependenceManager.POETRY:
+                install_poetry_job = Job("sh", "pip vinstall poetry]")
+                install_dependences_job = Job("sh", "poetry install")
+                singleton.stages["build"].jobs.insert(0, install_poetry_job)
+                singleton.stages["build"].jobs.insert(1, install_dependences_job)
+
+                # обёртка команд в "poetry run"
+                for stage in singleton.stages.values(): 
+                    for job in stage.jobs:
+                        if "python" in job.tag:
+                            job.command = "poetry run " + job.command
+            case DependenceManager.REQUIREMENTS:
+                install_requirements_job = Job("sh", "pip install -r requirements.txt")
+                singleton.stages["build"].jobs.insert(0, install_requirements_job)
