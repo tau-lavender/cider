@@ -32,6 +32,7 @@ class PythonLanguage(Language):
         self.framework_config = FRAMEWORK_IMPORT_CONFIG
 
         self.requires_python = ""
+        self.main_file_name = None
         self.dependence_manager: DependenceManager = DependenceManager.NO_MANAGER
 
     def find_requires_python(self, file_contents: str):
@@ -59,6 +60,12 @@ class PythonLanguage(Language):
         elif file_path.name == "requirements.txt" and self.dependence_manager == DependenceManager.NO_MANAGER:
             self.dependence_manager = DependenceManager.REQUIREMENTS
 
+
+        if file_path.name in ("main.py", "_main_.py", "__main__.py"):
+            # TODO: kill abspath
+            self.main_file_name = str(file_path).replace("\\", ".")[:-3]
+            print(self.main_file_name)
+
         for framework in self.frameworks:
             framework.analyze(file_path, file_contents)
 
@@ -68,10 +75,10 @@ class PythonLanguage(Language):
             framework.build()
 
         singleton = Singleton()
-
         
-        python_run_job = Job("sh", f"python -m main")
-        singleton.stages["deploy"].jobs.append(python_run_job)
+        if not singleton.stages["deploy"].jobs:
+            default_job = Job("sh", "python -m src.{}")
+
 
         match self.dependence_manager:
             case DependenceManager.NO_MANAGER:
