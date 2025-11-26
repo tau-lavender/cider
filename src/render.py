@@ -10,18 +10,18 @@ class Render():
                     agent any
 
                     stages {{
-                        {}
+                {}
                     }}
                 }}
-            """)
+            """).replace('\n', '', 1)
 
         self.base_stage = dedent("""
                 stage('{}') {{
                     steps {{
-                        {}
+                {}
                     }}
                 }}
-            """)
+            """).replace('\n', '', 1)
 
     def render(self):
         singleton = Singleton()
@@ -36,6 +36,7 @@ class Render():
                 else:
                     steps.append(f"{job.runner} {job.command}")
             steps_render = "\n".join(steps)
+            steps_render = indent(steps_render, " " * 4 * 2)
 
             stage_render = self.base_stage.format(
                 stage.name,

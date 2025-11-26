@@ -51,8 +51,8 @@ class GoLanguage(Language):
 
         # deploy
         ext = ""
-        if sys.platform == "win32":
-            ext = ".exe"
+        # if sys.platform == "win32":
+        #     ext = ".exe"
 
         go_run_job = Job("sh", f"./executable{ext}")
         singleton.stages["deploy"].jobs.insert(0, go_run_job)

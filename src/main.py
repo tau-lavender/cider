@@ -15,13 +15,23 @@ app = typer.Typer()
 def main(
     link: str,
     dir: Path = ".",
-    ):
-    
-    print(link, dir)
+):
+    # if not dir.exists():
+    #     os.mkdir(dir)
 
-    if not dir.exists():
-        os.mkdir(dir)
-    subprocess.run(["git", "clone", link, dir])
+    # repo already exists
+    if (dir / '.git').exists():
+        print("* Repo already exists. Skipping git clone")
+    else:
+        print("* Attempting to clone repo...")
+        command = ["git", "clone", link]
+        if dir == ".":
+            dir = Path(os.getcwd()) / link.rsplit('/', 1)[0]
+        else:
+            command.append(dir)
+
+        subprocess.run(command)
+
     os.chdir(dir)
 
     main_analyzer = MainAnalyzer()
@@ -32,11 +42,10 @@ def main(
 
     render = Render()
     result = render.render()
+
+    print()
+    print("### Jenkinsfile ###\n")
     print(result)
-
-
-    # TODO
-    # Build
 
 
 if __name__ == "__main__":

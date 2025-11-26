@@ -21,5 +21,6 @@ class TestFramework(Framework):
     def build(self):
         singleton = Singleton()
         if self.test_found:
+            print("* Detected Go tests")
             run_job = Job(runner="sh", command="go test")
             singleton.stages["test"].jobs.append(run_job)

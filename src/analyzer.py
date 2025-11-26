@@ -48,6 +48,7 @@ class MainAnalyzer():
                             if fnmatch.fnmatch(file, mask):
                                 language.analyze(root / file)
                                 self.language_found = language
+                                print(f"* Detected language: {language.name}")
                                 break
     
     def build(self):

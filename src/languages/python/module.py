@@ -34,7 +34,6 @@ class PythonLanguage(Language):
         self.requires_python = ""
         self.dependence_manager: DependenceManager = DependenceManager.NO_MANAGER
 
-
     def find_requires_python(self, file_contents: str):
         if "requires-python" in file_contents:
             py_ver = file_contents[file_contents.find("requires-python"):]
@@ -50,16 +49,15 @@ class PythonLanguage(Language):
             file_contents = file.read()
         if file_path.name == "pyproject.toml":
             self.find_requires_python(file_contents)
-        
+
         if file_path.name == "uv.lock":
             self.find_requires_python(file_contents)
             self.dependence_manager = DependenceManager.UV
         elif file_path.name == "poetry.lock":
             self.find_requires_python(file_contents)
             self.dependence_manager = DependenceManager.POETRY
-        elif file_path.name == "requirements.txt":
+        elif file_path.name == "requirements.txt" and self.dependence_manager == DependenceManager.NO_MANAGER:
             self.dependence_manager = DependenceManager.REQUIREMENTS
-
 
         for framework in self.frameworks:
             framework.analyze(file_path, file_contents)
@@ -68,11 +66,14 @@ class PythonLanguage(Language):
         # TODO: если будет время добавить рендер докера
         for framework in self.frameworks:
             framework.build()
+
         singleton = Singleton()
         match self.dependence_manager:
             case DependenceManager.NO_MANAGER:
                 pass
             case DependenceManager.UV:
+                print("* Detected python dependency manager: uv")
+
                 uv_venv_job = Job("sh", "uv venv")
                 uv_sync_job = Job("sh", "uv sync")
                 singleton.stages["build"].jobs.insert(0, uv_venv_job)
@@ -84,6 +85,8 @@ class PythonLanguage(Language):
                         if "python" in job.tag:
                             job.command = "uv run " + job.command
             case DependenceManager.POETRY:
+                print("* Detected python dependency manager: poetry")
+
                 install_poetry_job = Job("sh", "pip vinstall poetry]")
                 install_dependences_job = Job("sh", "poetry install")
                 singleton.stages["build"].jobs.insert(0, install_poetry_job)
@@ -95,5 +98,7 @@ class PythonLanguage(Language):
                         if "python" in job.tag:
                             job.command = "poetry run " + job.command
             case DependenceManager.REQUIREMENTS:
+                print("* Detected python dependency manager: requirements.txt")
+
                 install_requirements_job = Job("sh", "pip install -r requirements.txt")
                 singleton.stages["build"].jobs.insert(0, install_requirements_job)
