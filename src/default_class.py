@@ -36,7 +36,8 @@ class Language():
 
 
 class Job():
-    def __init__(self):
+    def __init__(self, runner: str, command: str):
+        self.runner: str = ""
         self.command: str = ""
 
 
