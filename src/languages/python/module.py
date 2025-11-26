@@ -3,6 +3,7 @@ from src.default_class import (
     Job
 )
 
+from string import digits
 from enum import Enum, auto
 from pathlib import Path
 
@@ -33,12 +34,28 @@ class PythonLanguage(Language):
         self.requires_python = ""
         self.dependence_manager: DependenceManager = DependenceManager.NO_MANAGER
 
+
+    def find_requires_python(self, file_contents: str):
+        if "requires-python" in file_contents:
+            py_ver = file_contents[file_contents.find("requires-python"):]
+            py_ver = py_ver[: py_ver.find('\n')]
+            py_ver = py_ver[py_ver.find('"'): py_ver.rfind('"')]
+            for symbol in py_ver:
+                if symbol in digits + '.':
+                    self.requires_python += symbol
+        print(self.requires_python)
+
     def analyze(self, file_path: Path):
         with open(file_path, "r") as file:
             file_contents = file.read()
         if file_path.name == "pyproject.toml":
-            if "requires-python" in file_contents:
-                pass
+            self.find_requires_python(file_contents)
+        if file_path.name == "uv.lock":
+            self.find_requires_python(file_contents)
+            self.dependence_manager = DependenceManager.UV
+        if file_path.name == "poetry.lock":
+            self.find_requires_python(file_contents)
+            self.dependence_manager = DependenceManager.POETRY
 
         for framework in self.frameworks:
             framework.analyze(file_path, file_contents)
