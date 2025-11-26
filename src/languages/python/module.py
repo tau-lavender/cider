@@ -63,4 +63,4 @@ class PythonLanguage(Language):
                 for stage in singleton.stages.values(): 
                     for job in stage.jobs:
                         if "python" in job.tag:
-                            job.command = "uv run" + job.command
+                            job.command = "uv run " + job.command
