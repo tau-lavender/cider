@@ -14,7 +14,8 @@ app = typer.Typer()
 def main(
     link: str,
     dir: Path = ".",
-):
+    ):
+    
     print(link, dir)
 
     if not dir.exists():
@@ -22,11 +23,8 @@ def main(
     subprocess.run(["git", "clone", link, dir])
     os.chdir(dir)
 
-    # TODO
-    # create class Analyzer
     main_analyzer = MainAnalyzer()
     main_analyzer.load_languages()
-
     main_analyzer.analyze()
 
     os.chdir(PATH_TO_ROOT)

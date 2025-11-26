@@ -34,10 +34,19 @@ class MainAnalyzer():
         """
         Ходим по файлам, кидаем их в аналайзеры
         """
+        language_found = None
         for root, dirs, files in Path(os.getcwd()).walk():
             for file in files:
-                for language in self.languages:
-                    for mask in language.masks:
+                if language_found is not None: # TODO поддержка мультиязычности
+                    for mask in language_found.masks:
                         if fnmatch.fnmatch(file, mask):
-                            language.analyze(root / file)
+                            language_found.analyze(root / file)
                             break
+                else:
+                    for language in self.languages:
+                        for mask in language.masks:
+                            if fnmatch.fnmatch(file, mask):
+                                language.analyze(root / file)
+                                language_found = language
+                                break
+
