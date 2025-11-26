@@ -39,13 +39,13 @@ class MainAnalyzer():
             for file in files:
                 if self.language_found is not None: # TODO поддержка мультиязычности
                     for mask in self.language_found.masks:
-                        if fnmatch.fnmatch(file, mask):
+                        if fnmatch.fnmatch(file, mask) or file == mask:
                             self.language_found.analyze(root / file)
                             break
                 else:
-                    for language in self.languages:
+                    for language in self.languages: # TODO: объединить
                         for mask in language.masks:
-                            if fnmatch.fnmatch(file, mask):
+                            if fnmatch.fnmatch(file, mask) or file == mask:
                                 language.analyze(root / file)
                                 self.language_found = language
                                 print(f"* Detected language: {language.name}")

@@ -14,22 +14,15 @@ app = typer.Typer()
 @app.command()
 def main(
     link: str,
-    dir: Path = ".",
+    dir: Path | None = None,
 ):
-    # if not dir.exists():
-    #     os.mkdir(dir)
-
-    # repo already exists
+    if dir is None:
+        dir = Path(os.getcwd()) / link.rsplit('/', 1)[-1]
     if (dir / '.git').exists():
         print("* Repo already exists. Skipping git clone")
     else:
         print("* Attempting to clone repo...")
-        command = ["git", "clone", link]
-        if dir == ".":
-            dir = Path(os.getcwd()) / link.rsplit('/', 1)[0]
-        else:
-            command.append(dir)
-
+        command = ["git", "clone", link, dir]
         subprocess.run(command)
 
     os.chdir(dir)

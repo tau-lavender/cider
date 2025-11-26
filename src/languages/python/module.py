@@ -26,7 +26,7 @@ class PythonLanguage(Language):
         self.masks: set = {
             "*.py",
             "pyproject.toml",
-            "requirements.txt"
+            "requirements.txt",
             "uv.lock",
         }
         self.framework_config = FRAMEWORK_IMPORT_CONFIG
@@ -82,7 +82,7 @@ class PythonLanguage(Language):
                 # обёртка команд в "uv run"
                 for stage in singleton.stages.values():
                     for job in stage.jobs:
-                        if "python" in job.tag:
+                        if "python" in job.tags:
                             job.command = "uv run " + job.command
             case DependenceManager.POETRY:
                 print("* Detected python dependency manager: poetry")
@@ -95,7 +95,7 @@ class PythonLanguage(Language):
                 # обёртка команд в "poetry run"
                 for stage in singleton.stages.values():
                     for job in stage.jobs:
-                        if "python" in job.tag:
+                        if "python" in job.tags:
                             job.command = "poetry run " + job.command
             case DependenceManager.REQUIREMENTS:
                 print("* Detected python dependency manager: requirements.txt")
