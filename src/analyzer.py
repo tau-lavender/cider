@@ -18,6 +18,7 @@ class MainAnalyzer():
     """
 
     def __init__(self):
+        self.language_found = None
         self.languages: list[Language] = []
 
     def load_languages(self):
@@ -34,19 +35,22 @@ class MainAnalyzer():
         """
         Ходим по файлам, кидаем их в аналайзеры
         """
-        language_found = None
         for root, dirs, files in Path(os.getcwd()).walk():
             for file in files:
-                if language_found is not None: # TODO поддержка мультиязычности
-                    for mask in language_found.masks:
+                if self.language_found is not None: # TODO поддержка мультиязычности
+                    for mask in self.language_found.masks:
                         if fnmatch.fnmatch(file, mask):
-                            language_found.analyze(root / file)
+                            self.language_found.analyze(root / file)
                             break
                 else:
                     for language in self.languages:
                         for mask in language.masks:
                             if fnmatch.fnmatch(file, mask):
                                 language.analyze(root / file)
-                                language_found = language
+                                self.language_found = language
                                 break
-
+    
+    def build(self):
+        if self.language_found is None:
+            raise RuntimeError("No language found")
+        self.language_found.build()

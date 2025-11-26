@@ -26,7 +26,7 @@ def main(
     main_analyzer = MainAnalyzer()
     main_analyzer.load_languages()
     main_analyzer.analyze()
-
+    main_analyzer.build()
     os.chdir(PATH_TO_ROOT)
 
     # TODO
