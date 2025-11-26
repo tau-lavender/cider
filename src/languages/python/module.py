@@ -68,9 +68,15 @@ class PythonLanguage(Language):
             framework.build()
 
         singleton = Singleton()
+
+        
+        python_run_job = Job("sh", f"python -m main")
+        singleton.stages["deploy"].jobs.append(python_run_job)
+
         match self.dependence_manager:
             case DependenceManager.NO_MANAGER:
-                pass
+                print("* Python dependency manager not detected")
+
             case DependenceManager.UV:
                 print("* Detected python dependency manager: uv")
 
@@ -84,6 +90,7 @@ class PythonLanguage(Language):
                     for job in stage.jobs:
                         if "python" in job.tags:
                             job.command = "uv run " + job.command
+            
             case DependenceManager.POETRY:
                 print("* Detected python dependency manager: poetry")
 
@@ -97,6 +104,7 @@ class PythonLanguage(Language):
                     for job in stage.jobs:
                         if "python" in job.tags:
                             job.command = "poetry run " + job.command
+            
             case DependenceManager.REQUIREMENTS:
                 print("* Detected python dependency manager: requirements.txt")
 
