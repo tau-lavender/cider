@@ -25,7 +25,8 @@ class Render():
         singleton = Singleton()
 
         stages = []
-        for stage in singleton.stages.values():
+        for stage_name in ("build", "test", "deploy"):
+            stage = singleton.stages[stage_name]
             steps = []
             for jobs in stage.jobs:
                 if jobs.runner == "sh":
