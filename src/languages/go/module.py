@@ -1,23 +1,13 @@
-import sys
-
 from src.default_class import (
     Language,
     Job
 )
 
-from enum import Enum, auto
 from pathlib import Path
 
 from src.singleton import Singleton
 
 from src.languages.go.config import FRAMEWORK_IMPORT_CONFIG
-
-
-class DependenceManager(Enum):
-    NO_MANAGER = auto()
-    UV = auto()
-    POETRY = auto()
-    REQUIREMENTS = auto()
 
 
 class GoLanguage(Language):
