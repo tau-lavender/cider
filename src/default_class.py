@@ -1,5 +1,6 @@
 import importlib
 import inspect
+from pathlib import Path
 
 
 class Framework():
@@ -7,7 +8,7 @@ class Framework():
         self.project_data = set()
         self.name = "Base Framework"
 
-    def analyze(self):
+    def analyze(self, file_path: Path):
         pass
 
     def build(self):
@@ -28,7 +29,7 @@ class Language():
                 if not issubclass(Framework, framework[1]) and issubclass(framework[1], Framework):
                     self.frameworks.append(framework[1]())
 
-    def analyze(self):
+    def analyze(self, file_path: Path):
         pass
 
     def build(self):
@@ -37,8 +38,9 @@ class Language():
 
 class Job():
     def __init__(self, runner: str, command: str):
-        self.runner: str = ""
-        self.command: str = ""
+        self.runner: str = runner
+        self.command: str = command
+        self.tags = set()
 
 
 class Stage():
