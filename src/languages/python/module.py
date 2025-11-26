@@ -43,19 +43,23 @@ class PythonLanguage(Language):
             for symbol in py_ver:
                 if symbol in digits + '.':
                     self.requires_python += symbol
-        print(self.requires_python)
+        # print(self.requires_python)
 
     def analyze(self, file_path: Path):
         with open(file_path, "r") as file:
             file_contents = file.read()
         if file_path.name == "pyproject.toml":
             self.find_requires_python(file_contents)
+        
         if file_path.name == "uv.lock":
             self.find_requires_python(file_contents)
             self.dependence_manager = DependenceManager.UV
-        if file_path.name == "poetry.lock":
+        elif file_path.name == "poetry.lock":
             self.find_requires_python(file_contents)
             self.dependence_manager = DependenceManager.POETRY
+        elif file_path.name == "requirements.txt":
+            self.dependence_manager = DependenceManager.REQUIREMENTS
+
 
         for framework in self.frameworks:
             framework.analyze(file_path, file_contents)
