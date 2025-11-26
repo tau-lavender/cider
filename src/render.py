@@ -28,7 +28,10 @@ class Render():
         for stage in singleton.stages.values():
             steps = []
             for jobs in stage.jobs:
-                steps.append(f"{jobs.runner} '{jobs.command}'")
+                if jobs.runner == "sh":
+                    steps.append(f"{jobs.runner} '{jobs.command}'")
+                else:
+                    steps.append(f"{jobs.runner} {jobs.command}")
             steps_render = "\n".join(steps)
 
             stage_render = self.base_stage.format(
