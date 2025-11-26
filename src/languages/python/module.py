@@ -3,10 +3,10 @@ from src.default_class import (
     Job
 )
 
-from singleton import Singleton
-
 from enum import Enum, auto
 from pathlib import Path
+
+from src.singleton import Singleton
 
 from src.languages.python.config import FRAMEWORK_IMPORT_CONFIG
 
@@ -29,17 +29,17 @@ class PythonLanguage(Language):
             "uv.lock",
         }
         self.framework_config = FRAMEWORK_IMPORT_CONFIG
-        
+
         self.requires_python = ""
         self.dependence_manager: DependenceManager = DependenceManager.NO_MANAGER
 
     def analyze(self, file_path: Path):
-        with open(file_path, "r") as file: 
+        with open(file_path, "r") as file:
             file_contents = file.read()
         if file_path.name == "pyproject.toml":
             if "requires-python" in file_contents:
                 pass
-                
+
         for framework in self.frameworks:
             framework.analyze(file_path, file_contents)
 
@@ -58,7 +58,7 @@ class PythonLanguage(Language):
                 singleton.stages["build"].jobs.insert(1, uv_sync_job)
 
                 # обёртка команд в "uv run"
-                for stage in singleton.stages.values(): 
+                for stage in singleton.stages.values():
                     for job in stage.jobs:
                         if "python" in job.tag:
                             job.command = "uv run " + job.command
@@ -69,7 +69,7 @@ class PythonLanguage(Language):
                 singleton.stages["build"].jobs.insert(1, install_dependences_job)
 
                 # обёртка команд в "poetry run"
-                for stage in singleton.stages.values(): 
+                for stage in singleton.stages.values():
                     for job in stage.jobs:
                         if "python" in job.tag:
                             job.command = "poetry run " + job.command

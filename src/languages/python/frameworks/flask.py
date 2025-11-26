@@ -30,4 +30,4 @@ class FlaskFramework(Framework):
         singleton = Singleton()
         if self.app_file:
             run_job = Job(runner="", command="")
-            singleton.stages["deploy"].append(run_job)
+            singleton.stages["deploy"].jobs.append(run_job)

@@ -6,6 +6,7 @@ from pathlib import Path
 from src.constants import PATH_TO_ROOT
 
 from src.analyzer import MainAnalyzer
+from src.render import Render
 
 app = typer.Typer()
 
@@ -28,6 +29,11 @@ def main(
     main_analyzer.analyze()
     main_analyzer.build()
     os.chdir(PATH_TO_ROOT)
+
+    render = Render()
+    result = render.render()
+    print(result)
+
 
     # TODO
     # Build

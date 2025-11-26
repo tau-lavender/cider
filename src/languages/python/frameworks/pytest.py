@@ -16,7 +16,7 @@ class PytestFramework(Framework):
     def analyze(self, file_path: Path, file_contents: str):
         if not self.pytest_found:
             if (
-                "_test" in file_path.name
+                (file_path.name.startswith("test_") or file_path.name.endswith("_test.py"))
                 and ("test_" in file_contents or "_test(" in file_contents)
             ):
                 self.pytest_found = True
@@ -26,4 +26,4 @@ class PytestFramework(Framework):
         if self.pytest_found:
             run_job = Job(runner="sh", command="pytest")
             run_job.tags.add('python')
-            singleton.stages["test"].append(run_job)
+            singleton.stages["test"].jobs.append(run_job)

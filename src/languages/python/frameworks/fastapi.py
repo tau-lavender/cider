@@ -30,4 +30,4 @@ class FastapiFramework(Framework):
         if self.fastapi_found:
             run_job = Job(runner="sh", command=f"fastapi run {self.fastapi_file}")
             run_job.tags.add('python')
-            singleton.stages["deploy"].append(run_job)
+            singleton.stages["deploy"].jobs.append(run_job)

@@ -8,7 +8,7 @@ class NoFramework(Framework):
         super().__init__()
         self.name = "No Framework"
 
-    def analyze(self, path: Path):
+    def analyze(self, file_path: Path, file_contents: str):
         # TODO
         # check imports
         if True:
