@@ -47,21 +47,38 @@ python -m src.main <ссылка на git-репозиторий> --dir <пут�
 
 - Скрипт клонирует репозиторий, анализирует его, собирает и рендерит конечный целый Jenkins файл.
 - Параметр `--dir` опциональный - если требуется клонировать репозиторий в определенный путь, иначе клонирует в рабочую директорию
+- Параметр `--test` опциональный - добавляет stage('checkout') для запуска в тестовом docker-compose с Jenkins
+
+## Запуск Jenkins для тестирования с docker-compose
+```bash
+docker compose up --build
+
+# Доступ к Jenkins http://localhost:8080
+# Пользователь: admin
+# Пароль: admin123
+```
 
 # Пример
+```bash
+# Анализ Go проекта Minio
+uv run python -m src.main https://github.com/minio/minio --dir ../test/minio1
+```
 
-# Главная структура
+# Основная структура
 <pre>
     .
     ├── src/
     │   ├── languages/                  # Модули и конфиги поддерживаемых языков с фреймворками
     │   │   ├── python/   
+    │   │   │   ├── frameworks/   
+    │   │   │   │   ├── pytest.py       # Фреймворк
+    │   │   │   ├── module.py           # Модуль, в котором находится класс языка
     │   │   ├── java_kotlin/  
     │   │   ├── js_ts/  
     │   │   ├── go/
     │   ├── main.py                     # Точка запуска
-    │   ├── analyzer.py                 # Все анализаторы, включая основной (main).
-    │   ├── default_class.py            # ?
-    │   ├── render.py                   # Точка рендера файла
-    │   ├── singleton.py                # ?
+    │   ├── analyzer.py                 # Основной анализатор
+    │   ├── default_class.py            # Классы Language, Framework, Stage, Job
+    │   ├── render.py                   # Точка рендера Jenkins файла
+    │   ├── singleton.py                # Синглтон, который хранит глобальное состояние скрипта
 </pre>
