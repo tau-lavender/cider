@@ -40,10 +40,9 @@ uv run python -m src.main <ссылка на git-репозиторий> --dir <
 ```
 ## Запуск c requirements.txt
 ```bash
-uv venv
-uv sync
+pip install -r /path/to/requirements.txt
 
-uv run python -m src.main <ссылка на git-репозиторий> --dir <путь до папки>
+python -m src.main <ссылка на git-репозиторий> --dir <путь до папки>
 ```
 
 - Скрипт клонирует репозиторий, анализирует его, собирает и рендерит конечный целый Jenkins файл.
