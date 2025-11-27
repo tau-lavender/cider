@@ -16,6 +16,7 @@ class Singleton():
     def __init__(self):
         self.stages: dict[str, Stage] = {}
         self.init_stages()
+        self.test = False
 
     def init_stages(self):
         self.stages["build"] = Stage("build")

@@ -65,11 +65,19 @@ ENV MAVEN_HOME=/opt/maven \
 
 # Создание директории для SSH ключей
 RUN mkdir -p /var/jenkins_home/.ssh && \
-    chmod 700 /var/jenkins_home/.ssh && \
+    chmod 777 /var/jenkins_home/.ssh && \
     chown -R jenkins:jenkins /var/jenkins_home/.ssh
+
+RUN mkdir -p /var/jenkins_home/test && \
+    chmod 777 /var/jenkins_home/test && \
+    chown -R jenkins:jenkins /var/jenkins_home/test
+
+RUN git config --global --add safe.directory '*'
 
 # Переключение на пользователя jenkins
 USER jenkins
+
+RUN git config --global --add safe.directory '*'
 
 # Копирование и установка плагинов
 COPY --chown=jenkins:jenkins plugins.txt /usr/share/jenkins/ref/plugins.txt

@@ -27,7 +27,10 @@ class Render():
         singleton = Singleton()
 
         stages = []
-        for stage_name in ("build", "test", "deploy"):
+        for stage_name in ("checkout", "build", "test", "deploy"):
+            if stage_name not in singleton.stages:
+                continue
+
             stage = singleton.stages[stage_name]
             steps = []
             for job in stage.jobs:
