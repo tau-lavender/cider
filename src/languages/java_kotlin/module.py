@@ -33,17 +33,14 @@ class GoLanguage(Language):
         for framework in self.frameworks:
             framework.build()
 
-        # build
-        # TODO: maybe we dont need get sometimes
-        go_get_job = Job("sh", "go get .")
-        go_build_job = Job("sh", "go build -o executable")
-        singleton.stages["build"].jobs.insert(0, go_get_job)
-        singleton.stages["build"].jobs.insert(1, go_build_job)
+        install_job = Job("sh", "mvn install")
+        build_job = Job("sh", "mvn -B -DskipTests -Djar.finalName=output clean package")
+        singleton.stages["build"].jobs.insert(0, install_job)
+        singleton.stages["build"].jobs.insert(1, build_job)
 
-        # deploy
-        ext = ""
-        # if sys.platform == "win32":
-        #     ext = ".exe"
+        test_job = Job("sh", "mvn test")
+        print("* Detected tests")
+        singleton.stages["test"].jobs.insert(1, test_job)
 
-        go_run_job = Job("sh", f"./executable{ext}")
-        singleton.stages["deploy"].jobs.insert(0, go_run_job)
+        run_job = Job("sh", "java -jar target/output.jar")
+        singleton.stages["deploy"].jobs.insert(0, run_job)
