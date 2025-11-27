@@ -33,7 +33,7 @@ class PythonLanguage(Language):
         self.framework_config = FRAMEWORK_IMPORT_CONFIG
 
         self.requires_python = ""
-        self.main_file_name = None
+        self.main_file_names: list[str] = []
         self.dependence_manager: DependenceManager = DependenceManager.NO_MANAGER
 
     def find_requires_python(self, file_contents: str):
@@ -61,9 +61,8 @@ class PythonLanguage(Language):
         elif file_path.name == "requirements.txt" and self.dependence_manager == DependenceManager.NO_MANAGER:
             self.dependence_manager = DependenceManager.REQUIREMENTS
 
-
         if file_path.name in ("main.py", "_main_.py", "__main__.py"):
-            self.main_file_name = str(os.path.relpath(file_path, os.getcwd())).replace("\\", ".")[:-3]
+            self.main_file_names.append(str(os.path.relpath(file_path, os.getcwd())).replace("\\", ".").replace("/", ".")[:-3])
 
         for framework in self.frameworks:
             framework.analyze(file_path, file_contents)
@@ -74,11 +73,12 @@ class PythonLanguage(Language):
             framework.build()
 
         singleton = Singleton()
-        
-        if not singleton.stages["deploy"].jobs:
-            default_job = Job("sh", f"python -m {self.main_file_name}")
-            singleton.stages["deploy"].jobs.append(default_job)
 
+        main_file = min(self.main_file_names, key=lambda x: x.count('.'))
+
+        if not singleton.stages["deploy"].jobs:
+            default_job = Job("sh", f"python -m {main_file}")
+            singleton.stages["deploy"].jobs.append(default_job)
 
         match self.dependence_manager:
             case DependenceManager.NO_MANAGER:

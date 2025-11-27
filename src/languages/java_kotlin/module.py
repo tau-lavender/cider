@@ -13,9 +13,10 @@ from src.languages.go.config import FRAMEWORK_IMPORT_CONFIG
 class GoLanguage(Language):
     def __init__(self):
         super().__init__()
-        self.name = "Go"
+        self.name = "Java/Kotlin"
         self.masks: set = {
-            "*.go",
+            "*.java",
+            "*.kotlin",
         }
         self.framework_config = FRAMEWORK_IMPORT_CONFIG
 

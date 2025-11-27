@@ -25,8 +25,8 @@ class JsLanguage(Language):
         self.masks: set = {
             "*.jsx",
             "*.tsx",
-            "*.js",
-            "*.ts",
+            # "*.js",
+            # "*.ts",
             "package.json",
             "yarn.lock",
         }
