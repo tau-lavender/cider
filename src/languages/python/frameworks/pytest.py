@@ -24,6 +24,7 @@ class PytestFramework(Framework):
     def build(self):
         singleton = Singleton()
         if self.pytest_found:
+            print("* Detected Pytest")
             run_job = Job(runner="sh", command="pytest")
             run_job.tags.add('python')
             singleton.stages["test"].jobs.append(run_job)
