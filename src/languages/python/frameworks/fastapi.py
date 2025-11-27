@@ -17,12 +17,12 @@ class FastapiFramework(Framework):
     def analyze(self, file_path: Path, file_contents: str):
         if not self.fastapi_found:
             if (
-                "from fastapi import FastAPI " in file_contents
+                "from fastapi" in file_contents
                 or "import fastapi" in file_contents
             ):
                 self.fastapi_found = True
 
-        if "app = FastAPI(" in file_contents:
+        if "FastAPI(" in file_contents:
             self.fastapi_file = file_path
 
     def build(self):

@@ -9,23 +9,20 @@ from src.default_class import Job
 class PytestFramework(Framework):
     def __init__(self):
         super().__init__()
-        self.name = "Pytest"
+        self.name = "Django"
 
-        self.pytest_found = False
+        self.django_found = False
 
     def analyze(self, file_path: Path, file_contents: str):
         if not self.pytest_found:
-            if (
-                (file_path.name.startswith("test_") or file_path.name.endswith("_test.py"))
-                and ("test_" in file_contents or "_test(" in file_contents
-                      or "import pytest" in file_contents or "from pytest" in file_contents)
-            ):
+            if ("import django" in file_contents
+                or "from django" in file_contents):
                 self.pytest_found = True
 
     def build(self):
         singleton = Singleton()
         if self.pytest_found:
-            print("* Detected Pytest")
-            run_job = Job(runner="sh", command="pytest")
+            print("* Detected Django")
+            run_job = Job(runner="sh", command="python manage.py runserver")
             run_job.tags.add('python')
             singleton.stages["test"].jobs.append(run_job)
