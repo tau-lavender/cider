@@ -6,6 +6,7 @@ from src.default_class import (
 from string import digits
 from enum import Enum, auto
 from pathlib import Path
+import os
 
 from src.singleton import Singleton
 
@@ -62,9 +63,7 @@ class PythonLanguage(Language):
 
 
         if file_path.name in ("main.py", "_main_.py", "__main__.py"):
-            # TODO: kill abspath
-            self.main_file_name = str(file_path).replace("\\", ".")[:-3]
-            print(self.main_file_name)
+            self.main_file_name = str(os.path.relpath(file_path, os.getcwd())).replace("\\", ".")[:-3]
 
         for framework in self.frameworks:
             framework.analyze(file_path, file_contents)
@@ -77,7 +76,8 @@ class PythonLanguage(Language):
         singleton = Singleton()
         
         if not singleton.stages["deploy"].jobs:
-            default_job = Job("sh", "python -m src.{}")
+            default_job = Job("sh", f"python -m {self.main_file_name}")
+            singleton.stages["deploy"].jobs.append(default_job)
 
 
         match self.dependence_manager:

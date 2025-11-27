@@ -15,7 +15,6 @@ def singleton(class_):
 class Singleton():
     def __init__(self):
         self.stages: dict[str, Stage] = {}
-
         self.init_stages()
 
     def init_stages(self):
